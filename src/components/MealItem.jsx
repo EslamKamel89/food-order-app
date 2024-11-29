@@ -1,10 +1,16 @@
 /* eslint-disable react/prop-types */
 
+import { useContext } from "react";
+import CartContext from "../store/CartContext";
 import { currencyFormatter } from "../utils/formatting";
 import Button from "./UI/Button";
 
 /* eslint-disable react/react-in-jsx-scope */
 export default function MealItem({ meal }) {
+  const cartCtx = useContext(CartContext);
+  function handleAddMealToCart() {
+    cartCtx.addItems(meal);
+  }
   return (
     <li className="meal-item">
       <article>
@@ -17,7 +23,7 @@ export default function MealItem({ meal }) {
           <p className="meal-item-desription">{meal.description}</p>
         </div>
         <p className="meal-item-actions">
-          <Button>Add To Cart</Button>
+          <Button onClick={handleAddMealToCart}>Add To Cart</Button>
         </p>
       </article>
     </li>
