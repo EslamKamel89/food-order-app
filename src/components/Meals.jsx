@@ -1,4 +1,5 @@
 import useHttp from "../hooks/useHttp";
+import Error from "./Error";
 import MealItem from "./MealItem";
 const requestConfig = { method: "GET" };
 /* eslint-disable react/react-in-jsx-scope */
@@ -29,13 +30,19 @@ export default function Meals() {
     error,
   } = useHttp("http://localhost:3000/meals", requestConfig, []);
 
+  if (error) {
+    return <Error title={"Error Occured"} message={error} />;
+  }
   return (
-    <ul id="meals">
-      {isLoading && <p>Loading data.....</p>}
-      {!isLoading &&
-        loadedMeals?.map((meal) => {
-          return <MealItem key={meal.id} meal={meal} />;
-        })}
-    </ul>
+    <>
+      {isLoading && <p className="center">Loading data.....</p>}
+      {!isLoading && (
+        <ul id="meals">
+          {loadedMeals?.map((meal) => {
+            return <MealItem key={meal.id} meal={meal} />;
+          })}
+        </ul>
+      )}
+    </>
   );
 }
