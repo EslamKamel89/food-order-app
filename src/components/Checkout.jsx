@@ -1,4 +1,5 @@
 import { useContext } from "react";
+import useHttp from "../hooks/useHttp";
 import CartContext from "../store/CartContext";
 import { UserProgressContext } from "../store/UserProgressContext";
 import { currencyFormatter } from "../utils/formatting";
@@ -7,9 +8,23 @@ import Input from "./UI/Input";
 import Modal from "./UI/Modal";
 
 /* eslint-disable react/react-in-jsx-scope */
+
+const requestConfig = {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+};
+
 export default function Checkout() {
   const userProgressCtx = useContext(UserProgressContext);
   const cartCtx = useContext(CartContext);
+
+  const { data, isLoading, error, sendRequest } = useHttp(
+    "http://localhost:3000/orders",
+    requestConfig
+  );
+
   const cartTotal = cartCtx.items.reduce(
     (totalPrice, item) => totalPrice + item.price * item.quantity,
     0
@@ -22,28 +37,23 @@ export default function Checkout() {
     event.preventDefault();
     const formData = new FormData(event.target);
     const customerData = Object.fromEntries(formData.entries());
-    console.log(customerData);
-    console.log(
-      JSON.stringify({
-        order: {
-          items: cartCtx.items,
-          customer: customerData,
-        },
-      })
-    );
-    // return ;
-    fetch("http://localhost:3000/orders", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json", // Inform the server of the data type
-      },
-      body: JSON.stringify({
-        items: cartCtx.items,
-        customer: customerData,
-      }),
-    }).then((response) => {
-      console.log(response);
+    requestConfig.body = JSON.stringify({
+      items: cartCtx.items,
+      customer: customerData,
     });
+    sendRequest();
+    // fetch("http://localhost:3000/orders", {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify({
+    //     items: cartCtx.items,
+    //     customer: customerData,
+    //   }),
+    // }).then((response) => {
+    //   console.log(response);
+    // });
   }
   return (
     <Modal
